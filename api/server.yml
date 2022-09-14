@@ -1,0 +1,222 @@
+openapi: 3.0.2
+info:
+  version: '1.0'
+  title: Server_Management
+  description: OpenAPI specification for Server
+servers:
+  - url: https://qa.server.com
+    description: QA
+  - url: https://prod.server.com
+    description: Production
+paths:
+  '/v1/servers':
+    get:
+      summary: List Servers
+      description: List of Servers
+      operationId: ListServersV1
+      tags:
+        - Servers
+      parameters:
+        - $ref: '#/components/parameters/PageNumberParameter'
+        - $ref: '#/components/parameters/PageSizeParameter'
+      responses:
+        '200':
+          description: List of Servers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerListPage'
+        '404':
+          description: Servers Not Found
+
+    post:
+      summary: New Server
+      description: Create New Server
+      operationId: CreateNewServer
+      tags:
+        - Servers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+      responses:
+        '201':
+          description: Created
+          headers:
+            location:
+              schema:
+                type: string
+                format: uri
+                example: http://server.com/v1/servers/{assignedId}
+        '400':
+          description: Bad Request
+        '409':
+          description: Conflict
+
+  '/v1/servers/{serverId}':
+    get:
+      summary: Get Server By ID
+      description: Get a single **Server** by its ID value
+      operationId: GetServerByIdV1
+      tags:
+        - Servers
+      parameters:
+        - $ref: '#/components/parameters/ServerIdPathParam'
+      responses:
+        '200':
+          description: Found Server with ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '404':
+          description: Not Found
+
+    put:
+      summary: Update Server By ID
+      description: Update info of a single **Server** by its ID value
+      operationId: UpdateServerByIdV1
+      tags:
+        - Servers
+      parameters:
+        - $ref: '#/components/parameters/ServerIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+      responses:
+        '204':
+          description: Updated
+        '404':
+          description: Not Found
+    delete:
+      summary: Delete Server by ID
+      description: Delete a single **Server** by its ID value
+      operationId: DeleteServerByIdV1
+      tags:
+        - Servers
+      parameters:
+        - $ref: '#/components/parameters/ServerIdPathParam'
+      responses:
+        '200':
+          description: Deleted
+        '404':
+          description: Not Found
+security:
+  - BasicAuth: []
+  - JwtAuthToken: []
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    JwtAuthToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Server:
+      type: object
+      description: Server object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: cycir
+        ip:
+          type: string
+          example: '192.168.0.1'
+        port:
+          type: integer
+          example: 8080
+        status:
+          type: string
+          example: ON
+        password:
+          type: string
+          example: jgodfjogjdo
+    ServerList:
+      type: array
+      minItems: 0
+      description: List of Servers
+      items:
+        $ref: '#/components/schemas/Server'
+    ServerListPage:
+      type: object
+      properties:
+        content:
+          $ref: '#/components/schemas/ServerList'
+    PagedResponse:
+      type: object
+      properties:
+        pageable:
+          $ref: '#/components/schemas/PagedResponse_pageable'
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+    PagedResponse_pageable_sort:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    PagedResponse_pageable:
+      type: object
+      properties:
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+  parameters:
+    PageNumberParameter:
+      name: pageNumber
+      in: query
+      description: Page Number
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    PageSizeParameter:
+      name: pageSize
+      in: query
+      description: Page Size
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 25
+    ServerIdPathParam:
+      name: serverId
+      in: path
+      description: Server ID
+      required: true
+      schema:
+        type: integer
