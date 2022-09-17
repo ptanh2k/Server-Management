@@ -4,6 +4,10 @@ import (
 	"flag"
 
 	"sm/internal/database"
+
+	"sm/internal/rest"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -15,8 +19,15 @@ func main() {
 
 	flag.Parse()
 
-	db := database.ConnectToDB(*host, *port, *username, *password, *dbname)
+	db, err := database.ConnectToDB(*host, *port, *username, *password, *dbname)
 
-	defer db.Close()
+	if err != nil {
+		panic(err)
+	}
 
+	r := gin.Default()
+
+	r.GET("/servers", rest.GetAllServers(db))
+
+	r.Run(":8080")
 }
