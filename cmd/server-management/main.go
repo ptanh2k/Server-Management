@@ -28,6 +28,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/servers", rest.GetAllServers(db))
+	r.POST("/servers", rest.CreateNewServer(db))
 
 	r.Run(":8080")
 }
