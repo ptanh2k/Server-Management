@@ -18,30 +18,49 @@ type APIServer struct {
 	Status bool   `json:"status"`
 }
 
+type ServerInput struct {
+	Name     string `json:"name"`
+	Ip       string `json:"ip"`
+	Port     uint16 `json:"port"`
+	Status   bool   `json:"status"`
+	Password string `json:"password"`
+}
+
+// GET /servers
 // Get all servers info
 func GetAllServers(db *gorm.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		servers := make([]APIServer, 0)
 
-		db.Table("servers").Model(&s.Server{}).Find(&servers, &APIServer{})
+		db.Table("servers").Find(&servers, &APIServer{})
 
 		c.IndentedJSON(http.StatusOK, gin.H{"servers": servers})
 	}
 	return gin.HandlerFunc(fn)
 }
 
+// GET /servers/{id}
+// Get server with id
+func GetServerWithId(db *gorm.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		sid := c.Param("id")
+
+		var servers []s.Server
+		var server APIServer
+
+		db.Table("servers").Where("id = ?", sid).Find(&servers).Scan(&server)
+
+		c.IndentedJSON(http.StatusOK, gin.H{"data": server})
+	}
+
+	return gin.HandlerFunc(fn)
+}
+
+// POST /servers
 // Add new server
 func CreateNewServer(db *gorm.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		type CreateServerInput struct {
-			Name     string `json:"name"`
-			Ip       string `json:"ip"`
-			Port     uint16 `json:"port"`
-			Status   bool   `json:"status"`
-			Password string `json:"password"`
-		}
-
-		var input CreateServerInput
+		var input ServerInput
 
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -60,6 +79,44 @@ func CreateNewServer(db *gorm.DB) gin.HandlerFunc {
 
 		c.JSON(http.StatusCreated, gin.H{"server": newServer})
 
+	}
+
+	return gin.HandlerFunc(fn)
+}
+
+// PATCH /servers/{id}
+// Update to a single server in the system
+func UpdateServer(db *gorm.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		sid := c.Param("id")
+
+		var servers []s.Server
+
+		find := db.Table("servers").Where("id = ?", sid).Find(&servers)
+
+		if err := find.Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Server not found"})
+			return
+		}
+
+		var input ServerInput
+
+		if err := c.ShouldBindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		updateServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status, Password: input.Password}
+
+		result := db.Table("servers").Model(&s.Server{}).Where("id = ?", sid).Updates(&updateServer)
+
+		if err := result.Error; err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("%d row(s) affected\n", result.RowsAffected)
+
+		c.JSON(http.StatusOK, gin.H{"server": updateServer})
 	}
 
 	return gin.HandlerFunc(fn)
