@@ -31,6 +31,7 @@ func main() {
 	r.GET("/servers/:id", rest.GetServerWithId(db))
 	r.POST("/servers", rest.CreateNewServer(db))
 	r.PATCH("/servers/:id", rest.UpdateServer(db))
+	r.DELETE("/servers/:id", rest.DeleteServer(db))
 
 	r.Run(":8080")
 }
