@@ -121,3 +121,19 @@ func UpdateServer(db *gorm.DB) gin.HandlerFunc {
 
 	return gin.HandlerFunc(fn)
 }
+
+// DELETE /servers/{id}
+// Delete server from system
+func DeleteServer(db *gorm.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		sid := c.Param("id")
+
+		result := db.Table("servers").Where("id = ?", sid).Delete(&s.Server{})
+
+		fmt.Printf("%d row(s) affected\n", result.RowsAffected)
+
+		c.JSON(http.StatusOK, gin.H{"data": "deleted"})
+	}
+
+	return gin.HandlerFunc(fn)
+}
