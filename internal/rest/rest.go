@@ -34,7 +34,7 @@ func GetAllServers(db *gorm.DB) gin.HandlerFunc {
 
 		db.Table("servers").Find(&servers, &APIServer{})
 
-		c.IndentedJSON(http.StatusOK, gin.H{"servers": servers})
+		c.IndentedJSON(http.StatusOK, servers)
 	}
 	return gin.HandlerFunc(fn)
 }
@@ -50,7 +50,7 @@ func GetServerWithId(db *gorm.DB) gin.HandlerFunc {
 
 		db.Table("servers").Where("id = ?", sid).Find(&servers).Scan(&server)
 
-		c.IndentedJSON(http.StatusOK, gin.H{"data": server})
+		c.IndentedJSON(http.StatusOK, server)
 	}
 
 	return gin.HandlerFunc(fn)
