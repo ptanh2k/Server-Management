@@ -5,10 +5,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
 )
+
+type ReturnedServerData struct {
+	Id     uint16 `json:"id,omitempty"`
+	Name   string `json:"name"`
+	Ip     string `json:"ip"`
+	Port   uint16 `json:"port"`
+	Status bool   `json:"status"`
+}
 
 // Fetch data from API
 func FetchData(url string) []byte {
@@ -30,7 +39,7 @@ func FetchData(url string) []byte {
 // s: json data to export to excel
 func ExportDataToExcel(data []byte) {
 
-	var jsonData interface{}
+	var jsonData []ReturnedServerData
 
 	err := json.Unmarshal(data, &jsonData)
 
@@ -39,18 +48,7 @@ func ExportDataToExcel(data []byte) {
 		return
 	}
 
-	data_servers, _ := jsonData.([]interface{})
-
-	// Set keys
-	first := data_servers[0]
-
-	firstColData, _ := first.(map[string]interface{})
-
-	keys := make([]string, 0, len(firstColData))
-
-	for k := range firstColData {
-		keys = append(keys, k)
-	}
+	properties := [5]string{"ID", "Name", "IP", "Port", "Status"}
 
 	xlsx := excelize.NewFile()
 	sheetName := "Sheet1"
@@ -63,34 +61,37 @@ func ExportDataToExcel(data []byte) {
 
 	var asciiForKey string
 
-	for i := 0; i < len(keys); i++ {
+	for i := 0; i < len(properties); i++ {
 		asciiForKey = string(rune(asciiValForKey))
-		xlsx.SetCellValue(sheetName, asciiForKey+"1", keys[i])
+		xlsx.SetCellValue(sheetName, asciiForKey+"1", properties[i])
 		asciiValForKey++
 	}
 
 	row := 2
 
-	for _, data_server := range data_servers {
+	for i := 0; i < len(jsonData); i++ {
+		values := make([]interface{}, 0, len(properties))
+
+		curData := jsonData[i]
+
+		v := reflect.ValueOf(curData)
+
+		for j := 0; j < v.NumField(); j++ {
+			values = append(values, v.Field(j).Interface())
+		}
+
 		c2 := 'A'
 
 		asciiValForValue := int(c2)
 
 		var asciiForValue string
 
-		colData, _ := data_server.(map[string]interface{})
-		values := make([]interface{}, 0, len(colData)) // Slice of server info
-		for _, v := range colData {
-			values = append(values, v)
-		}
-
-		fmt.Println(values)
-
 		for i := 0; i < len(values); i++ {
 			asciiForValue = string(rune(asciiValForValue))
 			xlsx.SetCellValue(sheetName, asciiForValue+strconv.Itoa(row), values[i])
 			asciiValForValue++
 		}
+
 		row++
 	}
 
