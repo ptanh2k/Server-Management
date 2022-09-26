@@ -95,7 +95,7 @@ func ExportDataToExcel(data []byte) {
 		row++
 	}
 
-	err = xlsx.SaveAs("../../result.xlsx")
+	err = xlsx.SaveAs("../../../result.xlsx")
 
 	if err != nil {
 		fmt.Print(err)
