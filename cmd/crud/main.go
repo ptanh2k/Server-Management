@@ -30,6 +30,7 @@ func main() {
 	r.GET("/servers", rest.GetAllServers(db))
 	r.GET("/servers/:id", rest.GetServerWithId(db))
 	r.POST("/servers", rest.CreateNewServer(db))
+	// r.POST("/_bulk/servers", rest.CreateMultipleServers(db))
 	r.PATCH("/servers/:id", rest.UpdateServer(db))
 	r.DELETE("/servers/:id", rest.DeleteServer(db))
 
