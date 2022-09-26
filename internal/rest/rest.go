@@ -137,3 +137,23 @@ func DeleteServer(db *gorm.DB) gin.HandlerFunc {
 
 	return gin.HandlerFunc(fn)
 }
+
+// Insert multiple servers
+// func CreateMultipleServers(db *gorm.DB) gin.HandlerFunc {
+// 	fn := func(c *gin.Context) {
+// 		var input []APIServer
+
+// 		if err := c.ShouldBindJSON(&input); err != nil {
+// 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+// 		}
+
+// 		var inputToDB []APIServer
+
+// 		for i := 0; i < len(input); i++ {
+// 			info := APIServer{Id: input[i].Id, Name: input[i].Name, Ip: input[i].Ip, Port: input[i].Port, Status: input[i].Status}
+// 			inputToDB = append(inputToDB, info)
+// 		}
+// 	}
+
+// 	return gin.HandlerFunc(fn)
+//}
