@@ -1,0 +1,18 @@
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  height: 100vh;
+}
+
+.login-form {
+  margin: 0 auto;
+  width: 300px;
+  margin-top: 10%;
+}
+
+.btn-submit {
+  width: 100%;
+}
