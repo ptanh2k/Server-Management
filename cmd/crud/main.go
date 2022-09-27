@@ -5,7 +5,7 @@ import (
 
 	"sm/internal/database"
 
-	"sm/internal/rest"
+	"sm/api/rest"
 
 	"github.com/gin-gonic/gin"
 )
