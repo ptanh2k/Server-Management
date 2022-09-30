@@ -1,25 +1,41 @@
 package main
 
 import (
-	"flag"
+	"fmt"
+	"log"
+	"os"
 
 	"sm/internal/database"
 
 	"sm/api/rest"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/joho/godotenv"
+
+	"strconv"
 )
 
 func main() {
-	host := flag.String("host", "localhost", "Enter host (localhost): ")
-	port := flag.Int("port", 5432, "Enter port (5432): ")
-	username := flag.String("user", "postgres", "Enter user (postgres): ")
-	password := flag.String("password", "password", "Enter password: ")
-	dbname := flag.String("db", "database", "Enter database name: ")
+	err := godotenv.Load("../../.env")
 
-	flag.Parse()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-	db, err := database.ConnectToDB(*host, *port, *username, *password, *dbname)
+	host := os.Getenv("SM_HOST")
+	dbport := os.Getenv("SM_PORT")
+	username := os.Getenv("SM_USERNAME")
+	password := os.Getenv("SM_PASSWORD")
+	dbname := os.Getenv("SM_DB_NAME")
+
+	port, err := strconv.Atoi(dbport)
+
+	if err != nil {
+		fmt.Println("Cannot convert string to int")
+	}
+
+	db, err := database.ConnectToDB(host, port, username, password, dbname)
 
 	if err != nil {
 		panic(err)

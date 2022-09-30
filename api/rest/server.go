@@ -19,11 +19,10 @@ type APIServer struct {
 }
 
 type ServerInput struct {
-	Name     string `json:"name"`
-	Ip       string `json:"ip"`
-	Port     uint16 `json:"port"`
-	Status   bool   `json:"status"`
-	Password string `json:"password"`
+	Name   string `json:"name"`
+	Ip     string `json:"ip"`
+	Port   uint16 `json:"port"`
+	Status bool   `json:"status"`
 }
 
 // GET /servers
@@ -67,9 +66,9 @@ func CreateNewServer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		newServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status, Password: input.Password}
+		newServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status}
 
-		result := db.Table("servers").Select("Name", "Ip", "Port", "Status", "Password").Create(&newServer)
+		result := db.Table("servers").Select("Name", "Ip", "Port", "Status").Create(&newServer)
 
 		if err := result.Error; err != nil {
 			panic(err)
@@ -106,7 +105,7 @@ func UpdateServer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		updateServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status, Password: input.Password}
+		updateServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status}
 
 		result := db.Table("servers").Model(&s.Server{}).Where("id = ?", sid).Updates(&updateServer)
 
