@@ -44,7 +44,7 @@ func main() {
 	r := gin.Default()
 
 	// HTTP Request for user
-	// r.POST("/register", )
+	r.POST("/register", rest.Register(db))
 
 	// HTTP Request for Server
 	r.GET("/servers", rest.GetAllServers(db))

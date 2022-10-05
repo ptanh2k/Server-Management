@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	gorm.Model
@@ -16,4 +20,18 @@ func (u *User) Register(db *gorm.DB) (*User, error) {
 	}
 
 	return u, nil
+}
+
+func (u *User) BeforeSave(db *gorm.DB) error {
+
+	// Hashing password to store
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return err
+	}
+
+	u.Password = string(hashedPassword)
+
+	return nil
 }
