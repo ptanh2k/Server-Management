@@ -12,3 +12,14 @@ INSERT INTO servers (name, ip, port, status) VALUES
 ('server2', '192.168.1.1', 3000, 'off')
 
 SELECT * FROM servers
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+    created_at TIME,
+    updated_at TIME,
+    deleted_at TIME
+);
+
+SELECT * FROM users
