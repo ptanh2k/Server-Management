@@ -1,9 +1,13 @@
 package model
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 
 	"golang.org/x/crypto/bcrypt"
+
+	t "sm/pkg/token"
 )
 
 type User struct {
@@ -19,19 +23,25 @@ func VerifyCorrectPassword(password string, hashedPassword string) error {
 func CheckLogin(username string, password string, db *gorm.DB) (string, error) {
 	u := User{}
 
-	err := db.Model(User{}).Where("username = ?", username).Take(&u).Error
+	err := db.Model(User{}).Select("username", "password").Where("username = ?", username).Take(&u).Error
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("this is the error 1")
 	}
 
 	err = VerifyCorrectPassword(password, u.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return "", fmt.Errorf("this is the error 2")
 	}
 
-	token, err := 
+	token, err := t.GenerateToken(uint16(u.ID))
+
+	if err != nil {
+		return "", fmt.Errorf("this is the error 3")
+	}
+
+	return token, nil
 }
 
 func (u *User) Register(db *gorm.DB) (*User, error) {
