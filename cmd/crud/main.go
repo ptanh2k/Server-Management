@@ -45,6 +45,7 @@ func main() {
 
 	// HTTP Request for user
 	r.POST("/register", rest.Register(db))
+	r.POST("/login", rest.Login(db))
 
 	// HTTP Request for Server
 	r.GET("/servers", rest.GetAllServers(db))

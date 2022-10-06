@@ -15,11 +15,11 @@ SELECT * FROM servers
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     created_at TIME,
     updated_at TIME,
     deleted_at TIME
 );
 
-SELECT * FROM users
+SELECT * FROM users WHERE users.username = 'admin' AND users.deleted_at IS NULL LIMIT 1

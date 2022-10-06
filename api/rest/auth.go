@@ -54,6 +54,15 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 
 		u.Username = input.Username
 		u.Password = input.Password
+
+		token, err := model.CheckLogin(u.Username, u.Password, db)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"token": token})
 	}
 
 	return gin.HandlerFunc(fn)
