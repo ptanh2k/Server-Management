@@ -11,7 +11,7 @@ import (
 	jwt "github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(user_id uint16) (string, error) {
+func GenerateToken(user_id uint) (string, error) {
 	token_lifespan, err := strconv.Atoi(os.Getenv("TOKEN_LIFESPAN"))
 
 	if err != nil {
@@ -58,7 +58,7 @@ func ExtractToken(c *gin.Context) string {
 	return ""
 }
 
-func ExtractTokenID(c *gin.Context) (uint16, error) {
+func ExtractTokenID(c *gin.Context) (uint, error) {
 	tokenString := ExtractToken(c)
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -68,7 +68,7 @@ func ExtractTokenID(c *gin.Context) (uint16, error) {
 	})
 
 	if err != nil {
-		return 0, err
+		return 100, fmt.Errorf("cannot parse token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -77,10 +77,10 @@ func ExtractTokenID(c *gin.Context) (uint16, error) {
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 
 		if err != nil {
-			return 0, err
+			return 200, err
 		}
-		return uint16(uid), nil
+		return uint(uid), nil
 	}
 
-	return 0, nil
+	return 300, nil
 }

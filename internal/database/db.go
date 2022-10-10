@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	s "sm/internal/model"
+	m "sm/internal/model"
 )
 
 func ConnectToDB(host string, port int, user string, password string, dbname string) (*gorm.DB, error) {
@@ -20,7 +20,7 @@ func ConnectToDB(host string, port int, user string, password string, dbname str
 		panic("Failed to connect to database")
 	}
 
-	db.AutoMigrate(&s.Server{})
+	db.AutoMigrate(&m.Server{}, &m.User{})
 
 	fmt.Println("Successfully connected")
 

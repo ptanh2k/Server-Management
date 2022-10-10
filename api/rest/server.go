@@ -11,7 +11,7 @@ import (
 )
 
 type APIServer struct {
-	Id     uint16 `json:"id,omitempty"`
+	ID     uint16 `json:"id,omitempty"`
 	Name   string `json:"name"`
 	Ip     string `json:"ip"`
 	Port   uint16 `json:"port"`

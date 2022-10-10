@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS servers (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name VARCHAR(20),
     ip TEXT NOT NULL,
     port SMALLINT NOT NULL,
@@ -13,13 +13,14 @@ INSERT INTO servers (name, ip, port, status) VALUES
 
 SELECT * FROM servers
 
+DROP TABLE users
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     created_at TIME,
     updated_at TIME,
-    deleted_at TIME
 );
 
 SELECT * FROM users WHERE users.username = 'admin' AND users.deleted_at IS NULL LIMIT 1

@@ -9,6 +9,8 @@ import (
 
 	"sm/api/rest"
 
+	"sm/middleware"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/joho/godotenv"
@@ -44,15 +46,22 @@ func main() {
 	r := gin.Default()
 
 	// HTTP Request for user
-	r.POST("/register", rest.Register(db))
-	r.POST("/login", rest.Login(db))
+	auth := r.Group("/auth")
+	auth.POST("/register", rest.Register(db))
+	auth.POST("/login", rest.Login(db))
+
+	// Admin
+	protected := r.Group("/admin")
+	protected.Use(middleware.JwtCheckMiddleware())
+	protected.GET("/user", rest.CurrentUser(db))
 
 	// HTTP Request for Server
-	r.GET("/servers", rest.GetAllServers(db))
-	r.GET("/servers/:id", rest.GetServerWithId(db))
-	r.POST("/servers", rest.CreateNewServer(db))
-	r.PATCH("/servers/:id", rest.UpdateServer(db))
-	r.DELETE("/servers/:id", rest.DeleteServer(db))
+	server := r.Group("/servers")
+	server.GET("/all", rest.GetAllServers(db))
+	server.GET("/:id", rest.GetServerWithId(db))
+	server.POST("/", rest.CreateNewServer(db))
+	server.PATCH("/:id", rest.UpdateServer(db))
+	server.DELETE("/:id", rest.DeleteServer(db))
 
 	r.Run(":8080")
 }
