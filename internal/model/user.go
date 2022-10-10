@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	gorm.Model
+	ID       uint   `gorm:"primarykey" json:"id"`
 	Username string `gorm:"size:255;not null;unique" json:"username"`
 	Password string `gorm:"size:255;not null;" json:"password"`
 }
@@ -26,22 +26,40 @@ func CheckLogin(username string, password string, db *gorm.DB) (string, error) {
 	err := db.Model(User{}).Select("username", "password").Where("username = ?", username).Take(&u).Error
 
 	if err != nil {
-		return "", fmt.Errorf("this is the error 1")
+		return "", fmt.Errorf(err.Error())
 	}
 
 	err = VerifyCorrectPassword(password, u.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", fmt.Errorf("this is the error 2")
+		return "", fmt.Errorf(err.Error())
 	}
 
-	token, err := t.GenerateToken(uint16(u.ID))
+	token, err := t.GenerateToken(uint(u.ID))
 
 	if err != nil {
-		return "", fmt.Errorf("this is the error 3")
+		return "", fmt.Errorf(err.Error())
 	}
 
 	return token, nil
+}
+
+func GetUserByID(uid uint, db *gorm.DB) (User, error) {
+
+	var u User
+
+	if err := db.First(&u, uid).Error; err != nil {
+		return u, err
+	}
+
+	u.PrepareGive()
+
+	return u, nil
+
+}
+
+func (u *User) PrepareGive() {
+	u.Password = ""
 }
 
 func (u *User) Register(db *gorm.DB) (*User, error) {

@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 
 	"sm/internal/model"
+
+	t "sm/pkg/token"
 )
 
 type Input struct {
@@ -63,6 +65,27 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"token": token})
+	}
+
+	return gin.HandlerFunc(fn)
+}
+
+func CurrentUser(db *gorm.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		user_id, err := t.ExtractTokenID(c)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		u, err := model.GetUserByID(user_id, db)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": u})
 	}
 
 	return gin.HandlerFunc(fn)
