@@ -68,19 +68,21 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	})
 
 	if err != nil {
-		return 100, fmt.Errorf("cannot parse token")
+		return 0, fmt.Errorf("cannot parse token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
+
+	fmt.Println(claims)
 
 	if ok && token.Valid {
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 
 		if err != nil {
-			return 200, err
+			return 0, err
 		}
 		return uint(uid), nil
 	}
 
-	return 300, nil
+	return 0, nil
 }
