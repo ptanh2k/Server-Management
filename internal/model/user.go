@@ -3,9 +3,8 @@ package model
 import (
 	"fmt"
 
-	"gorm.io/gorm"
-
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 
 	t "sm/pkg/token"
 )
@@ -23,7 +22,7 @@ func VerifyCorrectPassword(password string, hashedPassword string) error {
 func CheckLogin(username string, password string, db *gorm.DB) (string, error) {
 	u := User{}
 
-	err := db.Model(User{}).Select("username", "password").Where("username = ?", username).Take(&u).Error
+	err := db.Model(User{}).Where("username = ?", username).Take(&u).Error
 
 	if err != nil {
 		return "", fmt.Errorf(err.Error())
@@ -35,7 +34,7 @@ func CheckLogin(username string, password string, db *gorm.DB) (string, error) {
 		return "", fmt.Errorf(err.Error())
 	}
 
-	token, err := t.GenerateToken(uint(u.ID))
+	token, err := t.GenerateToken(u.ID)
 
 	if err != nil {
 		return "", fmt.Errorf(err.Error())
@@ -55,7 +54,6 @@ func GetUserByID(uid uint, db *gorm.DB) (User, error) {
 	u.PrepareGive()
 
 	return u, nil
-
 }
 
 func (u *User) PrepareGive() {
