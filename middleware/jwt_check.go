@@ -18,6 +18,5 @@ func JwtCheckMiddleware() gin.HandlerFunc {
 		}
 		c.Next()
 	}
-
 	return gin.HandlerFunc(fn)
 }

@@ -44,24 +44,27 @@ func main() {
 	}
 
 	r := gin.Default()
-
 	// HTTP Request for user
 	auth := r.Group("/auth")
-	auth.POST("/register", rest.Register(db))
-	auth.POST("/login", rest.Login(db))
-
+	{
+		auth.POST("/register", rest.Register(db))
+		auth.POST("/login", rest.Login(db))
+	}
 	// Admin
 	protected := r.Group("/admin")
-	protected.Use(middleware.JwtCheckMiddleware())
-	protected.GET("/user", rest.CurrentUser(db))
-
+	{
+		protected.Use(middleware.JwtCheckMiddleware())
+		protected.GET("/user", rest.CurrentUser(db))
+	}
 	// HTTP Request for Server
-	server := r.Group("/servers")
-	server.GET("/all", rest.GetAllServers(db))
-	server.GET("/:id", rest.GetServerWithId(db))
-	server.POST("/", rest.CreateNewServer(db))
-	server.PATCH("/:id", rest.UpdateServer(db))
-	server.DELETE("/:id", rest.DeleteServer(db))
 
+	server := r.Group("/servers")
+	{
+		server.GET("/all", middleware.JwtCheckMiddleware(), rest.GetAllServers(db))
+		server.GET("/:id", middleware.JwtCheckMiddleware(), rest.GetServerWithId(db))
+		server.POST("/", middleware.JwtCheckMiddleware(), rest.CreateNewServer(db))
+		server.PATCH("/:id", middleware.JwtCheckMiddleware(), rest.UpdateServer(db))
+		server.DELETE("/:id", middleware.JwtCheckMiddleware(), rest.DeleteServer(db))
+	}
 	r.Run(":8080")
 }

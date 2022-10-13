@@ -73,8 +73,6 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 
-	fmt.Println(claims)
-
 	if ok && token.Valid {
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 
