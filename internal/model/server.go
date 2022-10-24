@@ -1,17 +1,13 @@
 package model
 
-type Server struct {
-	ID     uint16 `json:"id,omitempty"`
-	Name   string `json:"name"`
-	Ip     string `json:"ip"`
-	Port   uint16 `json:"port"`
-	Status bool   `json:"status"`
-}
+import "time"
 
-// Constructor
-func (s *Server) Init(name string, ip string, port uint16, status bool) {
-	s.Name = name
-	s.Ip = ip
-	s.Port = port
-	s.Status = status
+type Server struct {
+	ServerID    uint16    `json:"server_id,omitempty"`
+	ServerName  string    `json:"server_name"`
+	Status      bool      `json:"status"`
+	CreatedTime time.Time `json:"created_time"`
+	LastUpdated time.Time `json:"last_updated"`
+	Domain      string    `json:"domain"`
+	CreatedBy   uint16    `json:"created_by"`
 }

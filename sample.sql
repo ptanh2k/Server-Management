@@ -1,17 +1,12 @@
 CREATE TABLE IF NOT EXISTS servers (
-    server_id SERIAL PRIMARY KEY,
-    server_name VARCHAR(20) UNIQUE NOT NULL,
+    server_id INTEGER PRIMARY KEY,
+    server_name VARCHAR(20) NOT NULL,
     status BOOLEAN NOT NULL,
-	created_time TIMESTAMP NOT NULL,
-	last_updated TIMESTAMP NOT NULL,
-	ipv4 VARCHAR(50) UNIQUE NOT NULL,
-	user_id INTEGER REFERENCES users(id)
+	created_time TIMESTAMP,
+	last_updated TIMESTAMP,
+	domain TEXT UNIQUE NOT NULL,
+	created_by INTEGER REFERENCES users(id)
 );
-
-INSERT INTO servers (server_name, status, created_time, last_updated, ipv4, user_id) VALUES
-('Cycir', 'ON', LOCALTIMESTAMP, LOCALTIMESTAMP, '192.168.1.1', 1)
-
-SELECT * FROM servers
 
 -- DROP TABLE users
 
