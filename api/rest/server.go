@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	s "sm/internal/model"
+	"time"
 
 	"net/http"
 
@@ -10,28 +11,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type APIServer struct {
-	ID     uint16 `json:"id,omitempty"`
-	Name   string `json:"name"`
-	Ip     string `json:"ip"`
-	Port   uint16 `json:"port"`
-	Status bool   `json:"status"`
-}
-
 type ServerInput struct {
-	Name   string `json:"name"`
-	Ip     string `json:"ip"`
-	Port   uint16 `json:"port"`
-	Status bool   `json:"status"`
+	ServerName string `json:"server_name"`
+	Domain     string `json:"domain"`
 }
 
 // GET /servers
 // Get all servers info
 func GetAllServers(db *gorm.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		servers := make([]APIServer, 0)
+		servers := make([]s.Server, 0)
 
-		db.Table("servers").Find(&servers, &APIServer{})
+		db.Table("servers").Find(&servers, &s.Server{})
 
 		c.IndentedJSON(http.StatusOK, servers)
 	}
@@ -45,9 +36,9 @@ func GetServerWithId(db *gorm.DB) gin.HandlerFunc {
 		sid := c.Param("id")
 
 		var servers []s.Server
-		var server APIServer
+		var server s.Server
 
-		db.Table("servers").Where("id = ?", sid).Find(&servers).Scan(&server)
+		db.Table("servers").Where("server_id = ?", sid).Find(&servers).Scan(&server)
 
 		c.IndentedJSON(http.StatusOK, server)
 	}
@@ -66,9 +57,9 @@ func CreateNewServer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		newServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status}
+		newServer := s.Server{ServerName: input.ServerName, CreatedTime: time.Now(), LastUpdated: time.Now(), Domain: input.Domain}
 
-		result := db.Table("servers").Select("Name", "Ip", "Port", "Status").Create(&newServer)
+		result := db.Table("servers").Create(&newServer)
 
 		if err := result.Error; err != nil {
 			panic(err)
@@ -91,7 +82,7 @@ func UpdateServer(db *gorm.DB) gin.HandlerFunc {
 
 		var servers []s.Server
 
-		find := db.Table("servers").Where("id = ?", sid).Find(&servers)
+		find := db.Table("servers").Where("server_id = ?", sid).Find(&servers)
 
 		if err := find.Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Server not found"})
@@ -105,9 +96,9 @@ func UpdateServer(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		updateServer := s.Server{Name: input.Name, Ip: input.Ip, Port: input.Port, Status: input.Status}
+		updateServer := s.Server{ServerName: input.ServerName, LastUpdated: time.Now(), Domain: input.Domain}
 
-		result := db.Table("servers").Model(&s.Server{}).Where("id = ?", sid).Updates(&updateServer)
+		result := db.Table("servers").Model(&s.Server{}).Where("server_id = ?", sid).Updates(&updateServer)
 
 		if err := result.Error; err != nil {
 			panic(err)
@@ -127,7 +118,7 @@ func DeleteServer(db *gorm.DB) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		sid := c.Param("id")
 
-		result := db.Table("servers").Where("id = ?", sid).Delete(&s.Server{})
+		result := db.Table("servers").Where("server_id = ?", sid).Delete(&s.Server{})
 
 		fmt.Printf("%d row(s) affected\n", result.RowsAffected)
 
